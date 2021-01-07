@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 #
 # Nginx - new server block
-# http://rosehosting.com
+# Fork from: http://rosehosting.com
+# Edited by: claudioruiz
+
 read -p "Enter domain name : " domain
 read -p "Enter username : " username
 
@@ -42,6 +44,9 @@ server {
     #error_log off;
 }
 EOF
+
+# I need to figure out how to make this creation of a file conditional 
+# in case the user would like to avoid creating the index.html... TBD
 
 # Creating index.html file
 cat > /var/www/$domain/index.html <<EOF
