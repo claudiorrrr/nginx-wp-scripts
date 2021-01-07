@@ -19,15 +19,15 @@ WEB_USER=$username
 [ $(id -g) != "0" ] && die "Script must be run as root."
 #[ $# != "1" ] && die "Usage: $(basename $0) domainName"
 
+# Creating /var/www/ directory
+mkdir -p /var/www/$domain
+
+# Creating {public,log} directories
+mkdir -p /var/www/$domain/logs
+touch -p /var/www/$domain/logs/$domain.log
+
 # Create nginx config file
 cat > $NGINX_AVAILABLE_VHOSTS/$domain.conf <<EOF
-### www to non-www
-#server {
-#    listen  80;
-#    server_name  www.$domain;
-#    return  301 http://$domain\$request_uri;
-#}
-
 server {
     listen   80;
     server_name $domain www.$domain;
@@ -38,63 +38,10 @@ server {
     #access_log $WEB_DIR/logs/$domain-access.log;
     access_log off;
 
-    error_log $WEB_DIR/logs/$domain-error.log;
+    error_log /var/www/$domain/logs/$domain.log;
     #error_log off;
-
-
-    ## REWRITES BELOW ##
-    
-    ## INCLUDE COMMONS ##
-
-    include php.conf;
-    include errors.conf;
-    include drop.conf;
-    include expires.conf;
 }
 EOF
-
-# Creating {public,log} directories
-mkdir -p $WEB_DIR/$username/{public_html,logs}
-
-# Create nginx config file
-cat > $NGINX_AVAILABLE_VHOSTS/$domain.conf <<EOF
-### www to non-www
-#server {
-#    listen      80;
-#    server_name  www.$domain;
-#    return      301 http://$domain\$request_uri;
-#}
-
-server {
-    listen   80;
-    server_name $domain www.$domain;
-    root  /var/www/$domain;
-    charset  utf-8;
-    index index.php index.html index.htm;
-
-    #access_log /logs/$domain-access.log;
-    access_log off;
-
-    error_log /var/www/$domain/logs/$domain-error.log;
-    #error_log off;
-
-
-    ## REWRITES BELOW ##
-
-    ## INCLUDE COMMONS ##
-
-    include php.conf;
-    include errors.conf;
-    include drop.conf;
-    include expires.conf;
-}
-EOF
-
-mkdir -p /var/www/$domain
-mkdir -p /var/www/$domain/logs
-
-# Creating {public,log} directories
-# mkdir -p $WEB_DIR/{public_html,logs}
 
 # Creating index.html file
 cat > /var/www/$domain/index.html <<EOF
