@@ -64,6 +64,16 @@ chown -R $WEB_USER:www-data /var/www/$domain/
 # Enable site by creating symbolic link
 ln -s $NGINX_AVAILABLE_VHOSTS/$domain.conf $NGINX_ENABLED_VHOSTS/
 
+# SSL
+echo "============================================"
+echo "SSL install"
+echo "============================================"
+
+# install certbot + python3-certbot-nginx 
+sudo apt install certbot python3-certbot-nginx
+sudo ufw allow 'Nginx Full'
+sudo ufw delete allow 'Nginx HTTP'
+
 # Restart
 echo "Do you wish to restart nginx?"
 select yn in "Yes" "No"; do
@@ -72,5 +82,9 @@ select yn in "Yes" "No"; do
         No ) exit;;
     esac
 done
+
+echo "============================================"
+echo "please run 'sudo certbot --nginx -d $domain -d www.$domain' at the end"
+echo "============================================"
 
 ok "Site Created for $domain"
