@@ -43,12 +43,12 @@ server {
     error_log /var/www/$domain/logs/$domain.log;
     #error_log off;
 
+    location / { 
+    try_files $uri $uri/ /index.php?$args;
+    }
+
     location ~ \.php$ {
                 include snippets/fastcgi-php.conf;
-        #
-        #       # With php7.0-cgi alone:
-        #       # fastcgi_pass 127.0.0.1:9000;
-        #       # With php7.0-fpm:
                 fastcgi_pass unix:/run/php/php7.4-fpm.sock;
         }
 }
@@ -99,6 +99,8 @@ done
 
 echo "============================================"
 echo "please run 'sudo certbot --nginx -d $domain -d www.$domain' at the end"
+echo "sudo certbot --nginx -d $domain -d www.$domain'"
+echo "at the end"
 echo "============================================"
 
 ok "Site Created for $domain"
