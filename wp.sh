@@ -68,11 +68,20 @@ if [ "$install_method" == 1 ]; then
 	echo
 	read -p "Install wordpress in a new directory (y/n): " new
 
-	if [ "$new" == y ] ; then
-		read -p "Name of the wordpress directory: " dir_name
-		mkdir -p /var/www/$dir_name
-		cd /var/www/$dir_name
-	fi
+
+	read -p "Install wordpress in a new directory (y/n):  - new question " new;do
+#
+        if [ "$new" == y ] ; then
+                echo "she said yes"
+		break
+               read -p "Name of the wordpress directory: " dir_name
+               mkdir -p /var/www/$dir_name
+               cd /var/www/$dir_name
+        elif [ "$new" == n ]; then
+		echo "she said no"
+		break
+fi
+done
 
 	# Download the latest wordpress package using wp-cli
 	wp core download --allow-root
@@ -143,28 +152,27 @@ else
 	# remove zip file
 	rm latest.tar.gz
 
+
+## for some reason this does not show at the end
 	clear
 	
-	echo "========================="
-	echo "Installation is complete."
-	echo "========================="
+	cat << EOF
+ 	============================================
+	Installation is complete.
+	============================================
+	MYSQL db/user creation completed!
+	Database  : ${dbname}
+	User      : ${dbuser}
+	Pass      : ${dbpass}
+	============================================
+	"Wordpress install completed!
+	Domain  	: ${url}
+	Email  	: ${admin_email}
+	User      : ${admin_name}
+	Pass      : ${admin_pass}
+	============================================
+	
+EOF
 
-	echo "============================================"
-	echo "MYSQL db/user creation completed!"
-	echo " >> Database  : ${dbname}"
-	echo " >> User      : ${dbuser}"
-	echo " >> Pass      : ${dbpass}"
-	echo "============================================"
-
-	echo
-
-	echo "============================================"
-	echo "Wordpress install completed!"
-	echo " >> Domain  	: ${url}"
-	echo " >> Email  	: ${admin_email}"
-	echo " >> User      : ${admin_name}"
-	echo " >> Pass      : ${admin_pass}"
-	echo "============================================"
-
-echo
 fi
+done

@@ -79,9 +79,12 @@ chown -R $WEB_USER:www-data /var/www/$domain/
 ln -s $NGINX_AVAILABLE_VHOSTS/$domain.conf $NGINX_ENABLED_VHOSTS/
 
 # SSL
-echo "============================================"
-echo "SSL install"
-echo "============================================"
+
+cat << EOF
+ ============================================
+ SSL install!
+ ============================================
+EOF
 
 # install certbot + python3-certbot-nginx 
 sudo apt install certbot python3-certbot-nginx
@@ -97,10 +100,18 @@ select yn in "Yes" "No"; do
     esac
 done
 
-echo "============================================"
-echo "please run 'sudo certbot --nginx -d $domain -d www.$domain' at the end"
-echo "sudo certbot --nginx -d $domain -d www.$domain'"
-echo "at the end"
-echo "============================================"
+cat << EOF
+ ============================================
+ Please run
+
+ sudo certbot --nginx -d $domain -d www.$domain
+ 
+ at the end
+ ============================================
+ Files created:
+ - /etc/nginx/sites-available/$domain.conf
+ - /var/www/$domain
+ ============================================
+EOF
 
 ok "Site Created for $domain"
