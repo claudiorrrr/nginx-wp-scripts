@@ -25,22 +25,18 @@ WEB_USER=$username
 mkdir -p /var/www/$domain
 
 # Creating {public,log} directories
-mkdir -p /var/www/$domain/logs
-touch -p /var/www/$domain/logs/$domain.log
+touch -p /var/logs/nginx/$domain.log
 
 # Create nginx config file
-cat > $NGINX_AVAILABLE_VHOSTS/$domain.conf <<EOF
+cat > $NGINX_AVAILABLE_VHOSTS/$domain <<EOF
 server {
     listen   80;
     server_name $domain www.$domain;
     root  /var/www/$domain;
-    charset  utf-8;
     index index.php index.html index.htm;
 
-    #access_log $WEB_DIR/logs/$domain-access.log;
-    access_log off;
-
-    error_log /var/www/$domain/logs/$domain.log;
+    error_log /var/logs/nginx/$domain.log;
+    
     #error_log off;
 
     location / { 
@@ -76,7 +72,7 @@ EOF
 chown -R $WEB_USER:www-data /var/www/$domain/
 
 # Enable site by creating symbolic link
-ln -s $NGINX_AVAILABLE_VHOSTS/$domain.conf $NGINX_ENABLED_VHOSTS/
+ln -s $NGINX_AVAILABLE_VHOSTS/$domain $NGINX_ENABLED_VHOSTS/
 
 # SSL
 
