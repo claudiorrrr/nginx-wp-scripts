@@ -42,6 +42,9 @@ server {
     try_files $uri $uri/ /index.php?$args;
     }
 
+    error_log /var/logs/nginx/$domain.log;
+    #error_log off;
+
     location ~ .php$ {
     include snippets/fastcgi-php.conf;
     fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
