@@ -29,26 +29,25 @@ touch -p /var/logs/nginx/$domain.log
 
 # Create nginx config file
 cat > $NGINX_AVAILABLE_VHOSTS/$domain <<EOF
+
 server {
-    listen 80;
-    server_name $domain www.$domain;
+    listen [::]:80;
+    server_name $domain;
     return 301 https://$server_name$request_uri;
 
     root  /var/www/$domain;
     index index.php index.html index.htm;
 
-    error_log /var/logs/nginx/$domain.log;
-    #error_log off;
-
     location / {
-        try_files $uri $uri/ /index.php$is_args$args;
+    try_files $uri $uri/ /index.php?$args;
     }
 
-    location ~ \.php$ {
-        include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+    location ~ .php$ {
+    include snippets/fastcgi-php.conf;
+    fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+    fastcgi_param HTTPS on;
     }
-}
+        }
 EOF
 
 # I need to figure out how to make this creation of a file conditional 
