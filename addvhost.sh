@@ -31,26 +31,59 @@ touch -p /var/logs/nginx/$domain.log
 cat > $NGINX_AVAILABLE_VHOSTS/$domain <<EOF
 
 server {
-    listen [::]:80;
-    server_name $domain;
-    return 301 https://$server_name$request_uri;
+    listen                  443 ssl http2;
+    listen                  [::]:443 ssl http2;
+    server_name             $domain;
+    root                    /var/www/$domain;
 
-    root  /var/www/$domain;
-    index index.php index.html index.htm;
+    # SSL
+    ssl_certificate /etc/letsencrypt/live/$domain/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/$domain/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 
+    # index.php
+    index                   index.php;
+
+    # index.php fallback
     location / {
-    try_files $uri $uri/ /index.php?$args;
+        try_files $uri $uri/ /index.php?$query_string;
     }
 
-    error_log /var/logs/nginx/$domain.log;
-    #error_log off;
-
+    # handle .php
     location ~ .php$ {
     include snippets/fastcgi-php.conf;
     fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
     fastcgi_param HTTPS on;
     }
-        }
+}
+
+# subdomains redirect
+server {
+    listen                  443 ssl http2;
+    listen                  [::]:443 ssl http2;
+    server_name             *.$domain;
+
+    # SSL
+    ssl_certificate /etc/letsencrypt/live/$domain/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/$domain/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+    return                  301 https://$domain$request_uri;
+}
+
+# HTTP redirect
+server {
+    listen      80;
+    listen      [::]:80;
+    server_name .$domain;
+
+    location / {
+        return 301 https://$domain$request_uri;
+    }
+}
+
 EOF
 
 # I need to figure out how to make this creation of a file conditional 
