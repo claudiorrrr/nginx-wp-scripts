@@ -31,57 +31,11 @@ touch -p /var/logs/nginx/$domain.log
 cat > $NGINX_AVAILABLE_VHOSTS/$domain <<EOF
 
 server {
-    listen                  443 ssl http2;
-    listen                  [::]:443 ssl http2;
-    server_name             $domain;
-    root                    /var/www/$domain;
-
-    # SSL
-    ssl_certificate /etc/letsencrypt/live/$domain/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/$domain/privkey.pem; # managed by Certbot
-    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
-
-    # index.php
-    index                   index.php;
-
-    # index.php fallback
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
-    }
-
-    # handle .php
-    location ~ .php$ {
-    include snippets/fastcgi-php.conf;
-    fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
-    fastcgi_param HTTPS on;
-    }
-}
-
-# subdomains redirect
-server {
-    listen                  443 ssl http2;
-    listen                  [::]:443 ssl http2;
-    server_name             *.$domain;
-
-    # SSL
-    ssl_certificate /etc/letsencrypt/live/$domain/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/$domain/privkey.pem; # managed by Certbot
-    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
-
-    return                  301 https://$domain$request_uri;
-}
-
-# HTTP redirect
-server {
-    listen      80;
-    listen      [::]:80;
-    server_name .$domain;
-
-    location / {
-        return 301 https://$domain$request_uri;
-    }
+        listen 80;
+        listen [::]:80;
+        root /var/www/$domain;
+        index index.html;
+        server_name $domain;
 }
 
 EOF
